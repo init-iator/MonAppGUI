@@ -1,0 +1,11 @@
+# ignore cache map:
+/__pycache__
+# ignore experiment files:
+zexperiment.py
+zodl_monitor.py
+*.log
+Planering.txt
+ToDo.md
+utils.py
+.env
+test.py
