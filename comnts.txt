@@ -1,0 +1,971 @@
+# class AlarmManager:
+#     def __init__(self):
+#         self.alarms = {"CPU": [], "Memory": [], "Disk": []}
+#         self.load_alarms()
+
+#     def configure_alarm(self):
+#         while True:
+#             print("\n1. CPU användning")
+#             print("2. Minnesanvändning")
+#             print("3. Diskanvändning")
+#             print("4. Tillbaka till huvudmeny")
+
+#             choice = input("Välj larmtyp (1-3) eller 4 för att återgå: ")
+
+#             for i in choice:
+#                 if choice == "1":
+#                     i = "cpu"
+#                 elif choice == "2":
+#                     i = "minnes"
+#                 elif choice == "3":
+#                     i = "disk"
+
+#             if choice == '4':
+#                 os.system("cls" if os.name == "nt" else "clear")
+#                 print("\nÅtergår till huvudmenyn...")
+#                 time.sleep(0.4)
+#                 os.system("cls" if os.name == "nt" else "clear")
+#                 break
+            
+#             if choice in ['1', '2', '3']:
+#                 while True:
+#                     level = input(f"\nStäll in nivå för {i} alarm mellan 0-100:\nEller '<' för att gå tillbaka\nVäntar på input: ")
+                    
+#                     if level == "<":
+#                         os.system("cls" if os.name == "nt" else "clear")
+#                         print("Går tillbaka till val av larmtyp...")
+#                         time.sleep(0.4)
+#                         break
+
+#                     try:
+#                         level = int(level)
+                        
+#                         if 0 < level <= 100:
+#                             if choice == '1':
+#                                 self.alarms["CPU"].append(level)
+#                             elif choice == '2':
+#                                 self.alarms["Memory"].append(level)
+#                             elif choice == '3':
+#                                 self.alarms["Disk"].append(level)
+                            
+#                             os.system("cls" if os.name == "nt" else "clear")
+#                             print(f"{i.capitalize()} larm satt till {level}%")
+#                             self.save_alarms()
+#                             alarmlogger.log(f"{i.capitalize()} larm är konfigurerat och satt till {level} %")
+#                             break
+                        
+#                         else:
+#                             os.system("cls" if os.name == "nt" else "clear")
+#                             print("Felaktig nivå. Ange en siffra mellan 1-100.")
+
+#                     except ValueError:
+#                         os.system("cls" if os.name == "nt" else "clear")
+#                         print("Felaktig input. Ange en siffra mellan 1-100.")
+
+#             else:
+#                 os.system("cls" if os.name == "nt" else "clear")
+#                 print("Felaktigt val. Välj ett alternativ mellan 1 och 4.")
+
+#     def display_alarms(self):
+#         os.system("cls" if os.name == "nt" else "clear")
+        
+        
+#         print("Lista: lagrade larm.\n")  
+        
+#         for category in ["CPU", "Memory", "Disk"]:
+#             for level in sorted(self.alarms[category]):
+#                 print(f"{category} larm {level}%")
+        
+#         input("\nTryck 'Enter' för att gå tillbaka till huvudmenyn.")
+#         os.system("cls" if os.name == "nt" else "clear")
+#         alarmlogger.log("Lista med lagrade larm har visats i skärmen")
+
+#     def remove_alarm(self):
+#         os.system("cls" if os.name == "nt" else "clear")
+        
+#         while True:
+#             try:
+#                 alarm_list = []  # Lista för att lagra larm
+#                 index = 1  # Räknare för larm
+                
+#                 # Visar en lista över lagrade larm
+#                 print("Lista: Lagrade larm.\n")  
+                
+#                 for category in ["CPU", "Memory", "Disk"]:  # Loopar igenom larmkategorier
+#                     for level in sorted(self.alarms[category]):  # Sorterar och visar larmnivåer
+#                         alarm_list.append((category, level))  # Lägger till larm i listan
+#                         print(f"{index}. {category} larm {level}%")  # Visar larm med index
+#                         index += 1
+                
+#                 if not alarm_list:  # Om inga larm finns
+#                     os.system("cls" if os.name == "nt" else "clear")
+#                     print("Inga larm att ta bort.")  # Meddelande om tom larmlista
+#                     return
+
+#                 # Tar emot användarens val för vilket larm som ska tas bort
+#                 choice = int(input("\nVälj ett larm att ta bort (ange siffra)\neller välj '0' för att återgå till huvudmenyn: "))  
+                
+#                 if 1 <= choice <= len(alarm_list):  # Kontrollerar giltigt val
+#                     category, level = alarm_list[choice - 1]  # Hämta larmkategori och nivå
+#                     self.alarms[category].remove(level)  # Tar bort larm från kategorin
+                    
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                     print(f"\nLarm {category} {level}% borttaget. Återgår till huvudmenyn...")  # Bekräftar borttagning
+#                     self.save_alarms()  # Sparar ändrade larm
+#                     alarmlogger.log(f"Larm för {category} {level} % är borttaget")
+#                     break
+                
+#                 elif choice == 0:  # Om användaren vill återgå
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                     break
+                
+#                 else:
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                     print("\nOgiltigt val, försök igen.")  # Felmeddelande
+
+#             except ValueError:  # Hantering av ogiltig inmatning
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                 print("\nFelaktig input, försök igen.")  # Felmeddelande
+
+#     def check_alarm(self, cpu, memory, disk):
+#         triggered = []  # Lista för att lagra utlösta larm
+        
+#         # Loopar igenom CPU-larm och kontrollerar om användningen överskrider nivån
+#         for level in sorted(self.alarms["CPU"], reverse=True):  
+#             if cpu > level:  # Kontrollerar om CPU-användningen överskrider nivån
+#                 triggered.append(f"*** VARNING, CPU ANVÄNDNING ÖVERSTIGER\t\t\t{level}% ***")  # Lägger till varning
+#                 break  # Avbryter loopen efter att första varningen har lagts till
+        
+#         # Loopar igenom minneslarm och kontrollerar om användningen överskrider nivån
+#         for level in sorted(self.alarms["Memory"], reverse=True):  
+#             if memory > level:  # Kontrollerar om minnesanvändningen överskrider nivån
+#                 triggered.append(f"*** VARNING, MINNESANVÄNDNING ÖVERSTIGER\t\t{level}% ***")  # Lägger till varning
+#                 break  # Avbryter loopen efter att första varningen har lagts till
+        
+#         # Loopar igenom disklarm och kontrollerar om användningen överskrider nivån
+#         for level in sorted(self.alarms["Disk"], reverse=True):  
+#             if disk > level:  # Kontrollerar om diskanvändningen överskrider nivån
+#                 triggered.append(f"*** VARNING, DISKANVÄNDNING ÖVERSTIGER\t\t\t{level}% ***")  # Lägger till varning
+#                 break  # Avbryter loopen efter att första varningen har lagts till
+        
+#         for message in triggered:  # Loopar igenom utlösta larm
+#             print(message)  # Visar varning på skärmen
+#             alarmlogger.log(f"Larm AKTIVERAD {message}")  # Loggar varningen
+#             send_email_alert(message)  # Skickar e-postvarning
+#             #alarmlogger.log(message)  # Loggar varningen med Logger
+
+#     def save_alarms(self):
+#         # Öppnar (eller skapar) en fil för att spara larm
+#         with open('alarms.json', 'w') as f:  
+#             json.dump(self.alarms, f)  # Sparar larmen i JSON-format
+
+#     def load_alarms(self):
+#         try:
+#             # Försöker öppna filen med larm
+#             with open('alarms.json', 'r') as f:  
+#                 self.alarms = json.load(f)  # Laddar larm från fil
+#         except FileNotFoundError:  # Hantering av fel om filen inte finns
+#             alarmlogger.log("Kunde inte ladda filen med lagrade larm")
+#             pass  # Inga åtgärder vid fil inte hittades
+
+# class Monitor:
+#     def __init__(self):
+#         self.active = False  # Initierar monitoreringens status (aktiv/inaktiv)
+
+#     def start_monitoring(self):
+#         self.active = True  # Sätter monitorering till aktiv
+#         os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#         while True:
+#             user_input_start_mon = input("Övervakning startad! Tryck 'Enter' för att återgå till huvudmenu ")
+#             if user_input_start_mon == "":
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                 print("\nBekräftelse mottagen! Återgår till huvudmenu...")  # Bekräftar återgång
+#                 time.sleep(0.6)  # Väntar en kort stund
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen igen
+#                 break  # Avslutar loopen
+#             else:
+#                 print("Du måste trycka på endast 'Enter'. Försök igen.")  # Använder felaktig inmatning
+
+#         logformon.log("Övervakning startad.")  # Loggar att övervakningen har startat
+
+#     def display_status(self):
+#         if not self.active:
+#             os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#             print("Ingen övervakning är aktiv. Aktivera alternativ \"1\" från huvudmenyn först!")  # Meddelande om inaktiv monitorering
+#         else:
+#             cpu_usage = psutil.cpu_percent(interval=0)  # Hämtar CPU-användning
+#             memory_info = psutil.virtual_memory()  # Hämtar minnesinformation
+#             disk_usage = psutil.disk_usage('/')  # Hämtar diskinformation
+            
+#             os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+
+#             print("Snapshot av resurs användningen:")  # Rubrik för resursanvändning
+#             print(f"CPU Användning:\t\t{cpu_usage}%")  # Visar CPU-användning
+#             print(
+#                 f"Minnesanvändning:\t{memory_info.percent}% "
+#                 f"({memory_info.used / (1024 ** 3):.2f} GB of "
+#                 f"{memory_info.total / (1024 ** 3):.2f} GB used)"
+#             )  # Visar minnesanvändning
+#             print(
+#                 f"Diskanvändning:\t\t{disk_usage.percent}% "
+#                 f"({disk_usage.used / (1024 ** 3):.2f} GB out of "
+#                 f"{disk_usage.total / (1024 ** 3):.2f} GB used)",
+#                 end="\n\n"
+#             )  # Visar diskens användning
+#             logformon.log(  # Loggar ögonblicksbild av resursanvändning
+#                 f"Användaren har hämtat ögonblicksbild av resursanvändningen:\n"
+#                 f"\t\t\t\t\t\tMätvärden:\n"
+#                 f"\t\t\t\t\t\tCPU Användning: {cpu_usage}%\n"
+#                 f"\t\t\t\t\t\tMinnessanvändning: {memory_info.percent}% "
+#                 f"({memory_info.used / (1024 ** 3):.2f} GB of "
+#                 f"{memory_info.total / (1024 ** 3):.2f} GB used)\n"
+#                 f"\t\t\t\t\t\tDiskanvändning: {disk_usage.percent}% "
+#                 f"({disk_usage.used / (1024 ** 3):.2f} GB out of "
+#                 f"{disk_usage.total / (1024 ** 3):.2f} GB used)"
+#             )
+            
+#         while True:
+#             user_input = input("Tryck endast på 'Enter' för att fortsätta: ")  # Väntar på användarinmatning
+#             if user_input == "":
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen
+#                 print("\nBekräftelse mottagen! Återgår till huvudmenu...")  # Bekräftar återgång
+#                 time.sleep(0.6)  # Väntar en kort stund
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensar skärmen igen
+#                 break  # Avslutar loopen
+#             else:
+#                 print("Du måste trycka på endast 'Enter'. Försök igen.")  # Meddelande om felaktig inmatning
+
+#     def check_status(self, alarm_manager):
+#         cpu_usage = psutil.cpu_percent(interval=0)  # Hämtar aktuell CPU-användning
+#         memory_usage = psutil.virtual_memory().percent  # Hämtar aktuell minnesanvändning
+#         disk_usage = psutil.disk_usage('/').percent  # Hämtar aktuell disk-användning
+        
+#         alarm_manager.check_alarm(cpu_usage, memory_usage, disk_usage)  # Kontrollerar larm med aktuella användningsvärden
+
+#     def start_realtimemonitor(self, cpu_usage, mem_usage, disk_usage, bars=50):   
+#         cpu_percent = (cpu_usage / 100.0)
+#         cpu_bar = '█' * int(cpu_percent * bars) + '-' * (bars - int(cpu_percent * bars))  # Skapa CPU-användningsstapel
+#         mem_procent = (mem_usage / 100.0)
+#         mem_bar = '█' * int(mem_procent * bars) + '-' * (bars - int(mem_procent * bars))  # Skapa minnesanvändningsstapel
+#         disk_percent = (disk_usage / 100.0)
+#         disk_bar = '█' * int(disk_percent * bars) + '-' * (bars - int(disk_percent * bars))  # Skapa diskanvändningsstapel
+#         # Visa användningsstaplarna
+#         print(
+#             f"\n\nCPU Usage:  |{cpu_bar}| {cpu_usage:.2f}%\n\n"
+#             f"MEM Usage:  |{mem_bar}| {mem_usage:.2f}%\n\n"
+#             f"DISK Usage: |{disk_bar}| {disk_usage:.2f}%"
+#         )
+#         print(
+#             f"\nPress \"{txd.BLUE}Ctrl+c{txd.END}\" to interrupt the performance monitor & go back to headmenu: ", 
+#             end="\n"
+#             )
+
+# class Logger:
+#     def __init__(self):
+#         # Skapa logs-mappen om den inte finns
+#         if not os.path.exists('logs'):
+#             os.makedirs('logs')
+
+#         # Filnamn med full sökväg till logs-mappen
+#         self.filename = os.path.join(
+#             'logs', datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log"))
+
+#     def log(self, message):
+#         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#         # Öppna loggfilen i append-läge och skriv meddelandet
+#         with open(self.filename, 'a') as f:
+#             f.write(f"{timestamp} - {message}\n")
+
+
+
+# def create_or_update_env_file():
+#     """
+#     Prompts the user to create or update a .env file.
+#     """
+
+#     dotenv_path = find_dotenv()
+
+#     if dotenv_path:
+#         # .env-fil hittades, ladda innehållet
+#         load_dotenv(dotenv_path)
+#         print(f"{txd.GREEN}Hittade en befintlig .env-fil med följande innehåll:{txd.END}")
+#         print(f"{txd.BLUE}SENDGRID_API_KEY{txd.END}={os.getenv('SENDGRID_API_KEY')}")
+#         print(f"{txd.BLUE}RECIPIENT_EMAIL{txd.END}={os.getenv('RECIPIENT_EMAIL')}")
+#         print(f"{txd.BLUE}SENDER_EMAIL{txd.END}={os.getenv('SENDER_EMAIL')}")
+
+#         # Fråga användaren om informationen stämmer
+#         confirm = input(f"Stämmer ovanstående information? ({txd.GREEN}ja{txd.END}/{txd.RED}nej{txd.END}): ")
+#         if confirm.lower() == "ja":
+#             print(f"{txd.BOLD}{txd.YELLOW}.env-filen har lästs in.{txd.END}{txd.END}")
+
+#         elif confirm.lower() != "ja":
+            
+#             # Om användaren svarar nej, prompt för nya värden
+#             sendgrid_api_key = input("Ange SendGrid API-nyckel: ")
+#             recipient_email = input("Ange mottagarens e-postadress: ")
+#             sender_email = input("Ange avsändarens e-postadress: ")
+
+#             # Uppdatera värdena i .env-filen
+#             set_key(dotenv_path, "SENDGRID_API_KEY", sendgrid_api_key)
+#             set_key(dotenv_path, "RECIPIENT_EMAIL", recipient_email)
+#             set_key(dotenv_path, "SENDER_EMAIL", sender_email)
+#             print(f"{txd.BOLD}{txd.YELLOW}.env-filen har uppdaterats. {txd.RED}STARTA OM PROGRAMMET!{txd.END}{txd.END}{txd.END}")
+#     else:
+#         # .env-fil hittades inte, skapa en ny
+#         print(f"{txd.BOLD}{txd.YELLOW}.env-fil hittades inte, skapa en ny{txd.END}{txd.END}")
+#         sendgrid_api_key = input("Ange SendGrid API-nyckel: ")
+#         recipient_email = input("Ange mottagarens e-postadress: ")
+#         sender_email = input("Ange avsändarens e-postadress: ")
+#         print(f"{txd.BOLD}{txd.YELLOW}.env-filen har uppdaterats. {txd.RED}STARTA OM PROGRAMMET!{txd.END}{txd.END}{txd.END}")
+
+#         with open('.env', 'w') as f:
+#             f.write(f"SENDGRID_API_KEY={sendgrid_api_key}\n")
+#             f.write(f"RECIPIENT_EMAIL={recipient_email}\n")
+#             f.write(f"SENDER_EMAIL={sender_email}\n")
+
+
+
+# Huvudmenyn för applikationen
+# def main_menu():
+#     while True:
+#         # Visa menyalternativ
+#         print(f"\n{txdec.GREEN}*** Övervakningsapplikation ***{txdec.END}\n")
+#         print(f"{txdec.BLUE}1.{txdec.END} Starta övervakning")
+#         print(f"{txdec.BLUE}2.{txdec.END} Lista aktiv övervakning")
+#         print(f"{txdec.BLUE}3.{txdec.END} Skapa larm")
+#         print(f"{txdec.BLUE}4.{txdec.END} Visa larm")
+#         print(f"{txdec.BLUE}5.{txdec.END} Starta övervakningsläge")
+#         print(f"{txdec.BLUE}6.{txdec.END} Ta bort larm")
+#         print(f"{txdec.BLUE}7.{txdec.END} Realtidsövervakning (Prestanda)")
+#         print(f"{txdec.BLUE}8.{txdec.END} Kontrollera .env filen för email utskick")
+#         print(f"{txdec.RED}0.{txdec.END} Avsluta programmet")
+
+#         # Ta emot användarens val
+#         choice = input(f"\nVälj ett alternativ: {txdec.YELLOW}")
+#         print(txdec.END)
+
+#         if choice.isdigit():  # Kontrollera om valet är ett nummer
+#             choice = int(choice)
+#             if choice >= 0 and choice <= 8:  # Kontrollera om valet är inom giltigt intervall
+#                 logger.log(f"Användaren har gjort val {choice} från huvudmenun")  # Logga valet
+
+#                 # Hantera olika val
+#                 if choice == 1:
+#                     monitor.start_monitoring()  # Starta övervakning
+#                 elif choice == 2:
+#                     monitor.display_status()  # Visa status på aktiv övervakning
+#                 elif choice == 3:
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensa terminalfönstret
+#                     alarm_manager.configure_alarm()  # Konfigurera ett nytt larm
+#                 elif choice == 4:
+#                     alarm_manager.display_alarms()  # Visa befintliga larm
+#                 elif choice == 5:
+#                     start_monitoring_mode()  # Starta övervakningsläge
+#                 elif choice == 6:
+#                     alarm_manager.remove_alarm()  # Ta bort ett larm
+#                 elif choice == 7:
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensa terminalfönstret
+#                     logger.log("Läge för realtidsövervakning startad")
+#                     try:
+#                         while True:
+#                             # Kör realtidsövervakning för CPU, minne och disk
+#                             monitor.start_realtimemonitor(
+#                                 psutil.cpu_percent(),
+#                                 psutil.virtual_memory().percent,
+#                                 psutil.disk_usage("/").percent,
+#                                 30
+#                                 )
+#                             time.sleep(0.6)  # Vänta 0.6 sekunder mellan uppdateringar
+#                             os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen
+#                     except KeyboardInterrupt:
+#                         os.system("cls" if os.name == "nt" else "clear")  # Avsluta övervakningen vid Ctrl+C
+#                         print(f"{txdec.YELLOW}Realtidsövervakning avslutad.{txdec.END}")
+#                         logger.log("Läge för realtidsövervakning avslutad")
+#                         pass
+#                 elif choice == 8:
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen
+#                     create_or_update_env_file()
+#                     time.sleep(2)
+#                     logger.log("Användaren har inspekterat kongifuration för e-post utskick")
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen
+#                 elif choice == 0:
+#                     os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen
+#                     print(f"\n{txdec.BOLD}{txdec.CYAN}Hej-då................................{txdec.END}\n")
+#                     logger.log("Applikationen avslutad")  # Logga att applikationen avslutats                                       
+#                     break  # Avsluta programmet
+#             else:
+#                 os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen vid felaktigt val
+#                 print(f"{txdec.RED}Felaktigt val, försök igen.{txdec.END}")
+#                 logger.log("Användaren har gjort felaktig val")  # Logga felaktigt val
+#         else:
+#             os.system("cls" if os.name == "nt" else "clear")  # Rensa skärmen vid ogiltig inmatning
+#             print(f"{txdec.RED}Ogiltig inmatning, vänligen ange ett nummer.{txdec.END}")
+#             logger.log("Användaren har matat in ogiltig inmatning.")  # Logga ogiltig inmatning
+
+
+# def main_menu():
+#     while True:
+#         os.system("cls" if os.name == "nt" else "clear")
+#         print(f"\n{txdec.GREEN}*** Övervakningsapplikation ***{txdec.END}\n")
+#         for i, option in enumerate([
+#             "Starta övervakning",
+#             "Lista aktiv övervakning",
+#             "Skapa larm",
+#             "Visa larm",
+#             "Starta övervakningsläge",
+#             "Ta bort larm",
+#             "Realtidsövervakning (Prestanda)",
+#             "Kontrollera .env filen för email utskick",
+#             "Avsluta programmet"
+#         ], start=1):
+#             print(f"{txdec.BLUE}{i}.{txdec.END} {option}")
+#         print(f"{txdec.RED}0.{txdec.END} Avsluta programmet")
+
+#         choice = input(f"\nVälj ett alternativ: {txdec.YELLOW}")
+#         print(txdec.END)
+
+#         if choice.isdigit() and 0 <= (choice := int(choice)) <= 8:
+#             logger.log(f"Användaren har gjort val {choice} från huvudmenyn")
+            
+#             if choice == 1:
+#                 monitor.start_monitoring()
+#             elif choice == 2:
+#                 monitor.display_status()
+#             elif choice == 3:
+#                 alarm_manager.configure_alarm()
+#             elif choice == 4:
+#                 alarm_manager.display_alarms()
+#             elif choice == 5:
+#                 start_monitoring_mode()
+#             elif choice == 6:
+#                 alarm_manager.remove_alarm()
+#             elif choice == 7:
+#                 logger.log("Läge för realtidsövervakning startad")
+#                 try:
+#                     while True:
+#                         monitor.start_realtimemonitor(
+#                             psutil.cpu_percent(),
+#                             psutil.virtual_memory().percent,
+#                             psutil.disk_usage("/").percent,
+#                             30
+#                         )
+#                         time.sleep(0.6)
+#                 except KeyboardInterrupt:
+#                     print(f"{txdec.YELLOW}Realtidsövervakning avslutad.{txdec.END}")
+#                     logger.log("Läge för realtidsövervakning avslutad")
+#             elif choice == 8:
+#                 create_or_update_env_file()
+#                 time.sleep(2)
+#                 logger.log("Användaren har inspekterat konfiguration för e-post utskick")
+#             elif choice == 0:
+#                 print(f"\n{txdec.BOLD}{txdec.CYAN}Hej-då................................{txdec.END}\n")
+#                 logger.log("Applikationen avslutad")
+#                 break
+#         else:
+#             print(f"{txdec.RED}Felaktigt val, försök igen.{txdec.END}")
+#             logger.log("Användaren har matat in ogiltig inmatning.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import tkinter as tk
+# from tkinter import messagebox
+# from sendgrid import SendGridAPIClient
+# from sendgrid.helpers.mail import Mail
+# import psutil
+# import json
+# import os
+# import time
+
+# class MonitorApp:
+#     def __init__(self, master):
+#         self.master = master
+#         self.master.title("Övervakningsapplikation")
+#         self.monitoring_active = False
+#         self.alarms = {"CPU": [], "Memory": [], "Disk": []}
+#         self.load_alarms()
+
+#         self.label = tk.Label(master, text="Välkommen till Övervakningsapplikationen!", font=("Helvetica", 16))
+#         self.label.pack(pady=10)
+
+#         self.start_button = tk.Button(master, text="Starta Övervakning", command=self.start_monitoring)
+#         self.start_button.pack(pady=5)
+
+#         self.status_button = tk.Button(master, text="Visa Resursstatus", command=self.display_status)
+#         self.status_button.pack(pady=5)
+
+#         self.alarm_button = tk.Button(master, text="Konfigurera Larm", command=self.configure_alarm)
+#         self.alarm_button.pack(pady=5)
+
+#         self.quit_button = tk.Button(master, text="Avsluta", command=master.quit)
+#         self.quit_button.pack(pady=20)
+
+#     def start_monitoring(self):
+#         self.monitoring_active = True
+#         self.label.config(text="Övervakning startad! Tryck 'Visa Resursstatus' för att se data.")
+
+#     def display_status(self):
+#         if not self.monitoring_active:
+#             messagebox.showwarning("Ingen övervakning", "Aktivera övervakning först!")
+#             return
+
+#         cpu_usage = psutil.cpu_percent()
+#         memory_info = psutil.virtual_memory()
+#         disk_usage = psutil.disk_usage('/')
+
+#         status_message = (
+#             f"CPU Användning: {cpu_usage}%\n"
+#             f"Minne: {memory_info.percent}% ({memory_info.used / (1024 ** 3):.2f} GB av {memory_info.total / (1024 ** 3):.2f} GB)\n"
+#             f"Disk: {disk_usage.percent}% ({disk_usage.used / (1024 ** 3):.2f} GB av {disk_usage.total / (1024 ** 3):.2f} GB)"
+#         )
+
+#         messagebox.showinfo("Resursstatus", status_message)
+
+#     def configure_alarm(self):
+#         alarm_window = tk.Toplevel(self.master)
+#         alarm_window.title("Konfigurera Larm")
+
+#         tk.Label(alarm_window, text="Ange larmnivå för CPU (1-100):").pack()
+#         self.cpu_entry = tk.Entry(alarm_window)
+#         self.cpu_entry.pack()
+
+#         tk.Label(alarm_window, text="Ange larmnivå för Minne (1-100):").pack()
+#         self.memory_entry = tk.Entry(alarm_window)
+#         self.memory_entry.pack()
+
+#         tk.Label(alarm_window, text="Ange larmnivå för Disk (1-100):").pack()
+#         self.disk_entry = tk.Entry(alarm_window)
+#         self.disk_entry.pack()
+
+#         tk.Button(alarm_window, text="Spara Larm", command=self.save_alarm).pack(pady=10)
+
+#     def save_alarm(self):
+#         try:
+#             cpu_alarm = int(self.cpu_entry.get())
+#             memory_alarm = int(self.memory_entry.get())
+#             disk_alarm = int(self.disk_entry.get())
+
+#             if all(1 <= x <= 100 for x in [cpu_alarm, memory_alarm, disk_alarm]):
+#                 self.alarms["CPU"].append(cpu_alarm)
+#                 self.alarms["Memory"].append(memory_alarm)
+#                 self.alarms["Disk"].append(disk_alarm)
+#                 self.save_alarms()
+#                 messagebox.showinfo("Larm inställt", "Larm har sparats!")
+#             else:
+#                 messagebox.showwarning("Ogiltig inmatning", "Ange värden mellan 1-100.")
+#         except ValueError:
+#             messagebox.showwarning("Ogiltig inmatning", "Ange giltiga nummer.")
+
+#     def load_alarms(self):
+#         if os.path.exists('alarms.json'):
+#             with open('alarms.json', 'r') as f:
+#                 self.alarms = json.load(f)
+
+#     def save_alarms(self):
+#         with open('alarms.json', 'w') as f:
+#             json.dump(self.alarms, f)
+
+#     def send_email_alert(self, message):
+#         # Implementera e-postavisering som tidigare
+#         pass
+
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = MonitorApp(root)
+#     root.mainloop()
+
+
+
+
+
+
+
+# import tkinter as tk
+# from tkinter import messagebox, simpledialog
+# from sendgrid import SendGridAPIClient
+# from sendgrid.helpers.mail import Mail
+# from dotenv import load_dotenv, find_dotenv, set_key
+# import psutil
+# import time
+# import os
+# import datetime
+# import json
+
+
+# class Monitor:
+#     def __init__(self):
+#         self.active = False
+
+#     def start_monitoring(self):
+#         self.active = True
+#         logformon.log("Övervakning startad.")
+
+#     def display_status(self):
+#         if not self.active:
+#             return "Ingen övervakning är aktiv. Aktivera alternativ \"1\" från huvudmenyn först!"
+
+#         cpu_usage = psutil.cpu_percent(interval=0)
+#         memory_info = psutil.virtual_memory()
+#         disk_usage = psutil.disk_usage('/')
+
+#         status = (
+#             f"CPU Användning:\t\t{cpu_usage}%\n"
+#             f"Minnesanvändning:\t{memory_info.percent}% ({memory_info.used / (1024 ** 3):.2f} GB of {memory_info.total / (1024 ** 3):.2f} GB used)\n"
+#             f"Diskanvändning:\t\t{disk_usage.percent}% ({disk_usage.used / (1024 ** 3):.2f} GB out of {disk_usage.total / (1024 ** 3):.2f} GB used)\n"
+#         )
+
+#         logformon.log(
+#             f"Användaren har hämtat ögonblicksbild av resursanvändningen:\n"
+#             f"CPU Användning: {cpu_usage}%\n"
+#             f"Minnessanvändning: {memory_info.percent}% ({memory_info.used / (1024 ** 3):.2f} GB of {memory_info.total / (1024 ** 3):.2f} GB used)\n"
+#             f"Diskanvändning: {disk_usage.percent}% ({disk_usage.used / (1024 ** 3):.2f} GB out of {disk_usage.total / (1024 ** 3):.2f} GB used)"
+#         )
+
+#         return status
+
+#     def check_status(self, alarm_manager):
+#         cpu_usage = psutil.cpu_percent(interval=0)
+#         memory_usage = psutil.virtual_memory().percent
+#         disk_usage = psutil.disk_usage('/').percent
+#         alarm_manager.check_alarm(cpu_usage, memory_usage, disk_usage)
+
+
+# class AlarmManager:
+#     def __init__(self):
+#         self.alarms = {"CPU": [], "Memory": [], "Disk": []}
+#         self.load_alarms()
+
+#     def configure_alarm(self):
+#         category = simpledialog.askstring("Larm Konfiguration", "Ange kategori (CPU, Memory, Disk):")
+#         if category in self.alarms.keys():
+#             level_input = simpledialog.askinteger("Ställ in larm", f"Ställ in {category} nivå mellan 1-100:")
+#             if level_input and 1 <= level_input <= 100:
+#                 self.alarms[category].append(level_input)
+#                 self.save_alarms()
+#                 return f"{category} larm satt till {level_input}%"
+#             else:
+#                 return "Felaktig nivå."
+#         return "Ogiltig kategori."
+
+#     def display_alarms(self):
+#         alarms_list = []
+#         for category in ["CPU", "Memory", "Disk"]:
+#             for level in sorted(self.alarms[category]):
+#                 alarms_list.append(f"{category} larm {level}%")
+#         return "\n".join(alarms_list) if alarms_list else "Inga larm att visa."
+
+#     def check_alarm(self, cpu, memory, disk):
+#         for category, usage in zip(["CPU", "Memory", "Disk"], [cpu, memory, disk]):
+#             for level in sorted(self.alarms[category], reverse=True):
+#                 if usage > level:
+#                     message = f"*** VARNING, {category} ANVÄNDNING ÖVERSTIGER {level}% ***"
+#                     logformon.log(f"Larm AKTIVERAD {message}")
+#                     send_email_alert(message)
+#                     return
+
+
+#     def save_alarms(self):
+#         with open('alarms.json', 'w') as f:
+#             json.dump(self.alarms, f)
+
+#     def load_alarms(self):
+#         try:
+#             with open('alarms.json', 'r') as f:
+#                 self.alarms = json.load(f)
+#         except FileNotFoundError:
+#             logformon.log("Kunde inte ladda lagrade larm")
+
+
+# class Logger:
+#     def __init__(self):
+#         os.makedirs('logs', exist_ok=True)
+#         self.filename = os.path.join('logs', datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log"))
+
+#     def log(self, message):
+#         with open(self.filename, 'a') as f:
+#             f.write(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} - {message}\n")
+
+
+# logger = Logger()
+# logformon = Logger()
+# alarm_manager = AlarmManager()
+
+# SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+# RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
+# SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+
+
+# def send_email_alert(message):
+#     try:
+#         email = Mail(
+#             from_email=SENDER_EMAIL,
+#             to_emails=RECIPIENT_EMAIL,
+#             subject="Larm aktiverat i övervakningsapplikationen",
+#             plain_text_content=message,
+#         )
+#         sg = SendGridAPIClient(SENDGRID_API_KEY)
+#         response = sg.send(email)
+#         print(f"E-post skickat med statuskod {response.status_code}")
+#     except Exception as e:
+#         print(f"Misslyckades med att skicka e-post: {str(e)}")
+
+
+# class App:
+#     def __init__(self, master):
+#         self.master = master
+#         master.title("Övervakningsapplikation")
+#         self.monitor = Monitor()
+
+#         self.start_monitoring_button = tk.Button(master, text="Starta Övervakning", command=self.start_monitoring)
+#         self.start_monitoring_button.pack()
+
+#         self.status_button = tk.Button(master, text="Visa Status", command=self.show_status)
+#         self.status_button.pack()
+
+#         self.configure_alarm_button = tk.Button(master, text="Konfigurera Larm", command=self.configure_alarm)
+#         self.configure_alarm_button.pack()
+
+#         self.show_alarms_button = tk.Button(master, text="Visa Larm", command=self.show_alarms)
+#         self.show_alarms_button.pack()
+
+#         self.exit_button = tk.Button(master, text="Avsluta", command=master.quit)
+#         self.exit_button.pack()
+
+#     def start_monitoring(self):
+#         self.monitor.start_monitoring()
+#         messagebox.showinfo("Information", "Övervakning har startat!")
+
+#     def show_status(self):
+#         status = self.monitor.display_status()
+#         messagebox.showinfo("Status", status)
+
+#     def configure_alarm(self):
+#         result = alarm_manager.configure_alarm()
+#         messagebox.showinfo("Konfigurera Larm", result)
+
+#     def show_alarms(self):
+#         alarms = alarm_manager.display_alarms()
+#         messagebox.showinfo("Larm", alarms)
+
+
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = App(root)
+#     root.mainloop()
+
+
+
+
+
+
+# import tkinter as tk
+# from tkinter import messagebox, simpledialog
+# from sendgrid import SendGridAPIClient
+# from sendgrid.helpers.mail import Mail
+# from dotenv import load_dotenv, find_dotenv, set_key
+# import psutil
+# import time
+# import os
+# import datetime
+# import json
+
+
+# class Monitor:
+#     def __init__(self):
+#         self.active = False
+
+#     def start_monitoring(self):
+#         self.active = True
+#         logformon.log("Övervakning startad.")
+
+#     def display_status(self):
+#         if not self.active:
+#             return "Ingen övervakning är aktiv. Aktivera alternativ \"1\" från huvudmenyn först!"
+
+#         cpu_usage = psutil.cpu_percent(interval=0)
+#         memory_info = psutil.virtual_memory()
+#         disk_usage = psutil.disk_usage('/')
+
+#         status = (
+#             f"CPU Användning:\t\t{cpu_usage}%\n"
+#             f"Minnesanvändning:\t{memory_info.percent}% ({memory_info.used / (1024 ** 3):.2f} GB of {memory_info.total / (1024 ** 3):.2f} GB used)\n"
+#             f"Diskanvändning:\t\t{disk_usage.percent}% ({disk_usage.used / (1024 ** 3):.2f} GB out of {disk_usage.total / (1024 ** 3):.2f} GB used)\n"
+#         )
+
+#         logformon.log(
+#             f"Användaren har hämtat ögonblicksbild av resursanvändningen:\n"
+#             f"CPU Användning: {cpu_usage}%\n"
+#             f"Minnessanvändning: {memory_info.percent}% ({memory_info.used / (1024 ** 3):.2f} GB of {memory_info.total / (1024 ** 3):.2f} GB used)\n"
+#             f"Diskanvändning: {disk_usage.percent}% ({disk_usage.used / (1024 ** 3):.2f} GB out of {disk_usage.total / (1024 ** 3):.2f} GB used)"
+#         )
+
+#         return status
+
+#     def check_status(self, alarm_manager):
+#         cpu_usage = psutil.cpu_percent(interval=0)
+#         memory_usage = psutil.virtual_memory().percent
+#         disk_usage = psutil.disk_usage('/').percent
+#         alarm_manager.check_alarm(cpu_usage, memory_usage, disk_usage)
+
+
+# class AlarmManager:
+#     def __init__(self):
+#         self.alarms = {"CPU": [], "Memory": [], "Disk": []}
+#         self.load_alarms()
+
+#     def configure_alarm(self):
+#         category = simpledialog.askstring("Larm Konfiguration", "Ange kategori (CPU, Memory, Disk):")
+#         if category in self.alarms.keys():
+#             level_input = simpledialog.askinteger("Ställ in larm", f"Ställ in {category} nivå mellan 1-100:")
+#             if level_input and 1 <= level_input <= 100:
+#                 self.alarms[category].append(level_input)
+#                 self.save_alarms()
+#                 return f"{category} larm satt till {level_input}%"
+#             else:
+#                 return "Felaktig nivå."
+#         return "Ogiltig kategori."
+
+#     def display_alarms(self):
+#         alarms_list = []
+#         for category in ["CPU", "Memory", "Disk"]:
+#             for level in sorted(self.alarms[category]):
+#                 alarms_list.append(f"{category} larm {level}%")
+#         return "\n".join(alarms_list) if alarms_list else "Inga larm att visa."
+
+#     def check_alarm(self, cpu, memory, disk):
+#         for category, usage in zip(["CPU", "Memory", "Disk"], [cpu, memory, disk]):
+#             for level in sorted(self.alarms[category], reverse=True):
+#                 if usage > level:
+#                     message = f"*** VARNING, {category} ANVÄNDNING ÖVERSTIGER {level}% ***"
+#                     logformon.log(f"Larm AKTIVERAD {message}")
+#                     send_email_alert(message)
+#                     return
+
+
+#     def save_alarms(self):
+#         with open('alarms.json', 'w') as f:
+#             json.dump(self.alarms, f)
+
+#     def load_alarms(self):
+#         try:
+#             with open('alarms.json', 'r') as f:
+#                 self.alarms = json.load(f)
+#         except FileNotFoundError:
+#             logformon.log("Kunde inte ladda lagrade larm")
+
+
+# class Logger:
+#     def __init__(self):
+#         os.makedirs('logs', exist_ok=True)
+#         self.filename = os.path.join('logs', datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log"))
+
+#     def log(self, message):
+#         with open(self.filename, 'a') as f:
+#             f.write(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} - {message}\n")
+
+
+# logger = Logger()
+# logformon = Logger()
+# alarm_manager = AlarmManager()
+
+# SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+# RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
+# SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+
+
+# def send_email_alert(message):
+#     try:
+#         email = Mail(
+#             from_email=SENDER_EMAIL,
+#             to_emails=RECIPIENT_EMAIL,
+#             subject="Larm aktiverat i övervakningsapplikationen",
+#             plain_text_content=message,
+#         )
+#         sg = SendGridAPIClient(SENDGRID_API_KEY)
+#         response = sg.send(email)
+#         print(f"E-post skickat med statuskod {response.status_code}")
+#     except Exception as e:
+#         print(f"Misslyckades med att skicka e-post: {str(e)}")
+
+
+# class App:
+#     def __init__(self, master):
+#         self.master = master
+#         master.title("Övervakningsapplikation")
+#         self.monitor = Monitor()
+
+#         # Skapa en ram för att hålla knapparna horisontellt
+#         button_frame = tk.Frame(master)
+#         button_frame.pack(pady=10)
+
+#         self.start_monitoring_button = tk.Button(button_frame, text="Starta Övervakning", command=self.start_monitoring)
+#         self.start_monitoring_button.pack(side=tk.LEFT, padx=5)
+
+#         self.status_button = tk.Button(button_frame, text="Visa Status", command=self.show_status)
+#         self.status_button.pack(side=tk.LEFT, padx=5)
+
+#         self.configure_alarm_button = tk.Button(button_frame, text="Konfigurera Larm", command=self.configure_alarm)
+#         self.configure_alarm_button.pack(side=tk.LEFT, padx=5)
+
+#         self.show_alarms_button = tk.Button(button_frame, text="Visa Larm", command=self.show_alarms)
+#         self.show_alarms_button.pack(side=tk.LEFT, padx=5)
+
+#         self.exit_button = tk.Button(button_frame, text="Avsluta", command=master.quit)
+#         self.exit_button.pack(side=tk.LEFT, padx=5)
+
+#     def start_monitoring(self):
+#         self.monitor.start_monitoring()
+#         messagebox.showinfo("Information", "Övervakning har startat!")
+
+#     def show_status(self):
+#         status = self.monitor.display_status()
+#         messagebox.showinfo("Status", status)
+
+#     def configure_alarm(self):
+#         result = alarm_manager.configure_alarm()
+#         messagebox.showinfo("Konfigurera Larm", result)
+
+#     def show_alarms(self):
+#         alarms = alarm_manager.display_alarms()
+#         messagebox.showinfo("Larm", alarms)
+
+
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = App(root)
+#     root.mainloop()
+
+
+
+
+
