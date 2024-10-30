@@ -194,8 +194,7 @@ def main_menu():
         "Starta övervakningsläge",
         "Ta bort larm",
         "Realtidsövervakning (Prestanda)",
-        "Kontrollera .env filen för email utskick",
-        "Avsluta programmet"
+        "Kontrollera .env filen för email utskick"
     ]
     
     while True:
